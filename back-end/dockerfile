@@ -1,0 +1,35 @@
+# Imagem base para o backend (Python)
+FROM python:3.11-slim
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libmariadb-dev-compat \
+    libmariadb-dev \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Definir o diretório de trabalho
+WORKDIR /app
+
+# Copiar o arquivo de dependências
+COPY requirements.txt .
+
+# Atualizar o pip para evitar problemas com dependências antigas
+RUN pip install --upgrade pip
+
+# Instalar as dependências do Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar o código do backend
+COPY . .
+
+# Rodar as migrações do banco de dados
+RUN alembic upgrade head
+
+# Expor a porta em que o backend vai rodar
+EXPOSE 8000
+
+# Comando para rodar o backend com Uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

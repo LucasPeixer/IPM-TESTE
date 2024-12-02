@@ -1,0 +1,23 @@
+# Imagem base do Node.js
+FROM node:18-alpine
+
+# Definir o diretório de trabalho
+WORKDIR /app
+
+# Copiar o package.json e package-lock.json para o container
+COPY frontend/package*.json ./
+
+# Instalar as dependências do projeto
+RUN npm install
+
+# Copiar todo o código-fonte do frontend para dentro do container
+COPY frontend/ ./
+
+# Construir o projeto para produção (opcional, caso você queira fazer a build)
+RUN npm run build
+
+# Expor a porta onde o Vite irá rodar
+EXPOSE 3000
+
+# Rodar o frontend com Vite em modo de desenvolvimento
+CMD ["npm", "run", "dev"]
